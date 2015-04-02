@@ -1,0 +1,13 @@
+#!/bin/bash
+#clear
+PROJECT_NAME=Project2.jar
+
+echo "--Starting Program--"
+cd bin/
+jar cfe $PROJECT_NAME MainMenu *.class
+java -jar $PROJECT_NAME $1
+
+echo "--Program Execution Finished"
+
+
+
