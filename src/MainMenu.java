@@ -37,7 +37,7 @@ public class MainMenu {
 			if (menu_choice != quit_code) {
 				//TODO: Launch required program
 				System.out.println("You have chosen option #" + menu_choice);
-				DatabaseConnection.createAndPopulate();
+				BerkleyDBClient.createAndPopulate();
 			}
 
 			//delay until the user press enter to display the menu again
