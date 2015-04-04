@@ -8,13 +8,14 @@ echo "--Starting Program--"
 
 mkdir $DATABASELOCATION
 
-cd bin/
+cd src/
 CLASSPATH=$CLASSPATH:.:/usr/share/java/db.jar:.
 export CLASSPATH
 LD_LIBRARY_PATH=/oracle/lib
 export LD_LIBRARY_PATH
 
-#javac MainMenu.java
+#jar cfe $PROJECT_NAME MainMenu *.class
+javac MainMenu.java
 java MainMenu $1
 
 #rm -rf $DATABASELOCATION
