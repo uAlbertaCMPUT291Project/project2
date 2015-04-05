@@ -6,7 +6,7 @@ DATABASELOCATION="/tmp/nstoik1_db"
 
 echo "--Starting Program--"
 
-mkdir $DATABASELOCATION
+mkdir -p $DATABASELOCATION
 
 cd bin/
 CLASSPATH=$CLASSPATH:.:/usr/share/java/db.jar:.
