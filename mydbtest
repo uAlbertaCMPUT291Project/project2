@@ -1,20 +1,22 @@
 #!/bin/bash
 #clear
 
-#DATABASELOCATION=/tmp/$USER"_db"
 DATABASELOCATION="/tmp/nstoik1_db"
 
 echo "--Starting Program--"
 
 mkdir -p $DATABASELOCATION
 
-cd bin/
+
 CLASSPATH=$CLASSPATH:.:/usr/share/java/db.jar:.
 export CLASSPATH
 LD_LIBRARY_PATH=/oracle/lib
 export LD_LIBRARY_PATH
 
-#javac MainMenu.java
+echo "Compiling..."
+
+javac -d bin -sourcepath src src/*.java
+cd bin/
 java MainMenu $1
 
 #rm -rf $DATABASELOCATION

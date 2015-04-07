@@ -13,13 +13,15 @@ public class BerkleyDBClient {
 	// BTREE table database location
 	private static final String BTREE_TABLE = "/tmp/nstoik1_db/btree_table";
 	// number of records in the database
-	private static final int NO_RECORDS = 100;
+	private static final int NO_RECORDS = 100000;
 	// Database object
 	private static Database hash_table;
 	// Secondary Database object
 	private static Database btree_table;
 	// Cursor object
-	private static Cursor myCursor = null;
+	private static Cursor hash_cursor;
+	// Cursor object
+	private static Cursor btree_cursor;
 
 	/*
 	 * Author: Nelson
@@ -38,6 +40,10 @@ public class BerkleyDBClient {
 			btree_dbConfig.setType(DatabaseType.BTREE);
 			btree_dbConfig.setAllowCreate(true);
 			btree_table = new Database(BTREE_TABLE, null, btree_dbConfig);
+			
+			//create the cursor's
+			hash_cursor = hash_table.openCursor(null, null);
+			btree_cursor = btree_table.openCursor(null, null);
 
 			/* populate the new database with NO_RECORDS records */
 			populateTable(NO_RECORDS);
@@ -70,7 +76,8 @@ public class BerkleyDBClient {
 	}
 
 	/*
-	 * Author: Nelson Closes the database and then removes it from disk as well
+	 * Author: Nelson 
+	 * Closes the database and then removes it from disk as well
 	 */
 	static void destoryDatabase() {
 
@@ -174,17 +181,12 @@ public class BerkleyDBClient {
 
 				/* to insert the key/data pair into the database */
 				status = hash_table.putNoOverwrite(null, kdbt, ddbt);
-
-				if (status.toString().equalsIgnoreCase(
-						"OperationStatus.KEYEXIST")) {
-					System.out.println("Hash table key already exists");
-				}
-				
 				status = btree_table.putNoOverwrite(null, kdbt, ddbt);
 
 				if (status.toString().equalsIgnoreCase(
 						"OperationStatus.KEYEXIST")) {
-					System.out.println("Btree table key already exists");
+					System.out.println("Key already exists, skipping this key value pair");
+					i--;
 				}
 			}
 		} catch (DatabaseException dbe) {
