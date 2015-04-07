@@ -4,8 +4,6 @@ import com.sleepycat.db.*;
 
 public class BerkleyDBClient {
 
-	// variable for if the database has been loaded or not
-	private static boolean DatabaseLoaded = false;
 	// database type: btree or hash or indexfile
 	private static String DatabaseTypeFromUser = null;
 	// databse location
@@ -29,14 +27,6 @@ public class BerkleyDBClient {
 	 */
 	static void createAndPopulate() {
 
-		if (DatabaseLoaded) {
-			System.out
-					.println("A database has already been created at the given location");
-			System.out
-					.println("Please destroy the database before creating a new one");
-			return;
-		}
-
 		try {
 
 			// Create the database object.
@@ -56,21 +46,23 @@ public class BerkleyDBClient {
 				my_table = new Database(DB_TABLE, null, dbConfig);
 				
 				
-			} else if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
+			}
+			/*else if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
+				
 				//setup my_table
 				dbConfig.setType(DatabaseType.HASH);
 				dbConfig.setAllowCreate(true);
 				my_table = new Database(DB_TABLE, null, dbConfig);
 				
 				//setup index_table
-				SecondaryKeyCreator keyCreator = null; // Your key creator implementation
+				//SecondaryKeyCreator keyCreator = null; // Your key creator implementation
 				SecondaryConfig secConfig = new SecondaryConfig();
 				secConfig.setType(DatabaseType.BTREE);
 				secConfig.setAllowCreate(true);
 				secConfig.setSortedDuplicates(true);
-				secConfig.setKeyCreator(keyCreator);
+				//secConfig.setKeyCreator(keyCreator);
 				index_table = new SecondaryDatabase(DB_TABLE_INDEX, null, my_table, secConfig);
-			}
+			}*/
 
 			System.out.println(DB_TABLE + " has been created");
 
@@ -79,12 +71,10 @@ public class BerkleyDBClient {
 			System.out
 					.println(NO_RECORDS + " records inserted into" + DB_TABLE);
 
-			DatabaseLoaded = true;
 
 		} catch (Exception e1) {
 			System.err.println("createAndPopulate failed: " + e1.toString());
 			System.exit(-1);
-			DatabaseLoaded = false;
 		}
 	}
 
@@ -111,10 +101,6 @@ public class BerkleyDBClient {
 	 */
 	static void destoryDatabase() {
 
-		if (!DatabaseLoaded) {
-			System.out.println("No database to destroy");
-			return;
-		}
 		try {
 			/* Close the database and the db environment */
 			closeDB();
@@ -126,7 +112,6 @@ public class BerkleyDBClient {
 			my_table.remove(DB_TABLE, null, null);
 
 			System.out.println(DB_TABLE + " closed and destroyed succesfully.");
-			DatabaseLoaded = false;
 			return;
 
 		} catch (Exception e1) {
@@ -157,10 +142,6 @@ public class BerkleyDBClient {
 	 * can be reopened later
 	 */
 	public static void closeDB() {
-		if (!DatabaseLoaded) {
-			return;
-		}
-
 		try {
 			//if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
 			//	index_table.close();
@@ -170,28 +151,6 @@ public class BerkleyDBClient {
 			e.printStackTrace();
 			System.out.println("Error closing Database!");
 		}
-	}
-
-	/*
-	 * if the database is not destroyed during the last session, it can be
-	 * reopened and used again
-	 */
-	public static boolean tryOpenExsistingDatabase() {
-
-		try {
-			my_table = new Database(DB_TABLE, null, null);
-			DatabaseLoaded = true;
-			return true;
-
-		} catch (FileNotFoundException e) {
-			DatabaseLoaded = false;
-			return false;
-		} catch (DatabaseException e) {
-			System.out.println("Database Exception");
-			DatabaseLoaded = false;
-			return false;
-		}
-
 	}
 
 	// -------------------------HELPER FUNCTIONS----------------------//

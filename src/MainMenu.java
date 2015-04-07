@@ -32,16 +32,6 @@ public class MainMenu {
 		}
 
 		BerkleyDBClient.setDatabaseType(args[0]);
-		if(BerkleyDBClient.tryOpenExsistingDatabase()) {
-			System.out.print("An exsisting database has been loaded from: ");
-			System.out.println(BerkleyDBClient.getTableLocation());
-			System.out.println("To use a new database, destroy this one first (Option 5)");
-		}
-		else {
-			System.out.print("No database could be loaded from: ");
-			System.out.println(BerkleyDBClient.getTableLocation());
-			System.out.println("Please create a new database first (Option 1)");
-		}
 
 		while (menu_choice != quit_code) {
 			menu_choice = get_menu_input();
