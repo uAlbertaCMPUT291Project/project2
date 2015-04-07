@@ -1,6 +1,4 @@
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Scanner;
 
 //Author: Nelson
@@ -80,12 +78,6 @@ public class MainMenu {
 		}
 
 		BerkleyDBClient.closeDB();
-		//clear the answer file upon exiting of the program
-		try {
-			new PrintWriter("answer.txt").close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 		System.out.println("Closing database and exiting. Bye!");
 	}
 
