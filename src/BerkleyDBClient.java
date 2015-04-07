@@ -7,20 +7,18 @@ public class BerkleyDBClient {
 	// database type: btree or hash or indexfile
 	private static String DatabaseTypeFromUser = null;
 	// databse location
-	private static final String DB_TABLE = "/tmp/nstoik1_db/db_table";
+	private static final String HASH_TABLE = "/tmp/nstoik1_db/hash_table";
 	// secondary databse location
-	private static final String DB_TABLE_INDEX = "/tmp/nstoik1_db/index_table";
+	private static final String BTREE_TABLE = "/tmp/nstoik1_db/btree_table";
 	// number of records in the database
 	private static final int NO_RECORDS = 100;
 
 	// Database object
-	private static Database my_table;
+	private static Database hash_table;
 	// Secondary Database object
-	private static SecondaryDatabase index_table;
+	private static Database btree_table;
 	// Cursor object
 	private static Cursor myCursor = null;
-	// Secondary cursor
-	private static SecondaryCursor secCursor = null;
 
 	/*
 	 * Author: Nelson
@@ -29,48 +27,22 @@ public class BerkleyDBClient {
 
 		try {
 
-			// Create the database object.
-			DatabaseConfig dbConfig = new DatabaseConfig();
-
-			if (DatabaseTypeFromUser.compareToIgnoreCase("btree") == 0) {
-				//setup my_table
-				dbConfig.setType(DatabaseType.BTREE);
-				dbConfig.setAllowCreate(true);
-				my_table = new Database(DB_TABLE, null, dbConfig);
-				
-				
-			} else if (DatabaseTypeFromUser.compareToIgnoreCase("hash") == 0) {
-				//setup my_table
-				dbConfig.setType(DatabaseType.HASH);
-				dbConfig.setAllowCreate(true);
-				my_table = new Database(DB_TABLE, null, dbConfig);
-				
-				
-			}
-			/*else if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
-				
-				//setup my_table
-				dbConfig.setType(DatabaseType.HASH);
-				dbConfig.setAllowCreate(true);
-				my_table = new Database(DB_TABLE, null, dbConfig);
-				
-				//setup index_table
-				//SecondaryKeyCreator keyCreator = null; // Your key creator implementation
-				SecondaryConfig secConfig = new SecondaryConfig();
-				secConfig.setType(DatabaseType.BTREE);
-				secConfig.setAllowCreate(true);
-				secConfig.setSortedDuplicates(true);
-				//secConfig.setKeyCreator(keyCreator);
-				index_table = new SecondaryDatabase(DB_TABLE_INDEX, null, my_table, secConfig);
-			}*/
-
-			System.out.println(DB_TABLE + " has been created");
+			// Create the hash database object.
+			DatabaseConfig hash_dbConfig = new DatabaseConfig();
+			hash_dbConfig.setType(DatabaseType.HASH);
+			hash_dbConfig.setAllowCreate(true);
+			hash_table = new Database(HASH_TABLE, null, hash_dbConfig);
+			
+			// Create the hash database object.
+			DatabaseConfig btree_dbConfig = new DatabaseConfig();
+			btree_dbConfig.setType(DatabaseType.BTREE);
+			btree_dbConfig.setAllowCreate(true);
+			btree_table = new Database(BTREE_TABLE, null, btree_dbConfig);
 
 			/* populate the new database with NO_RECORDS records */
 			populateTable(NO_RECORDS);
-			System.out
-					.println(NO_RECORDS + " records inserted into" + DB_TABLE);
-
+			System.out.println(NO_RECORDS + " records inserted into"
+					+ HASH_TABLE + " and " + BTREE_TABLE);
 
 		} catch (Exception e1) {
 			System.err.println("createAndPopulate failed: " + e1.toString());
@@ -106,24 +78,19 @@ public class BerkleyDBClient {
 			closeDB();
 
 			/* to remove the table */
-			//if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
-			//	index_table.remove(DB_TABLE_INDEX, null, null);
-			//}
-			my_table.remove(DB_TABLE, null, null);
+			// if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
+			// index_table.remove(DB_TABLE_INDEX, null, null);
+			// }
+			hash_table.remove(HASH_TABLE, null, null);
+			btree_table.remove(BTREE_TABLE, null, null);
 
-			System.out.println(DB_TABLE + " closed and destroyed succesfully.");
+			System.out.println(HASH_TABLE + " and " + BTREE_TABLE 
+					+ " closed and destroyed succesfully.");
 			return;
 
 		} catch (Exception e1) {
 			System.err.println("destroyDatabase failed: " + e1.toString());
 		}
-	}
-
-	/*
-	 * returns the path of the database location
-	 */
-	public static String getTableLocation() {
-		return DB_TABLE;
 	}
 
 	/*
@@ -143,10 +110,12 @@ public class BerkleyDBClient {
 	 */
 	public static void closeDB() {
 		try {
-			//if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
-			//	index_table.close();
-			//}
-			my_table.close();
+			// if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
+			// index_table.close();
+			// }
+			hash_table.close();
+			btree_table.close();
+			
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 			System.out.println("Error closing Database!");
@@ -221,7 +190,14 @@ public class BerkleyDBClient {
 				ddbt.setSize(s.length());
 
 				/* to insert the key/data pair into the database */
-				status = my_table.putNoOverwrite(null, kdbt, ddbt);
+				status = hash_table.putNoOverwrite(null, kdbt, ddbt);
+
+				if (!status.toString().equalsIgnoreCase(
+						"OperationStatus.SUCCESS")) {
+					System.out.println("Status is: " + status.toString());
+				}
+				
+				status = btree_table.putNoOverwrite(null, kdbt, ddbt);
 
 				if (!status.toString().equalsIgnoreCase(
 						"OperationStatus.SUCCESS")) {
