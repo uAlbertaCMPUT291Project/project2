@@ -1,5 +1,4 @@
 #!/bin/bash
-#clear
 
 DATABASELOCATION="/tmp/nstoik1_db"
 
@@ -13,13 +12,9 @@ export CLASSPATH
 LD_LIBRARY_PATH=/oracle/lib
 export LD_LIBRARY_PATH
 
-echo "Compiling..."
-
-javac -d bin -sourcepath src src/*.java
+javac -d bin src/*.java
 cd bin/
 java MainMenu $1
-
-#rm -rf $DATABASELOCATION
 
 echo "--Program Execution Finished"
 

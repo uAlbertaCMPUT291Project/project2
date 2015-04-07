@@ -4,7 +4,7 @@ import com.sleepycat.db.*;
 
 public class BerkleyDBClient {
 
-	//boolean about wheter the databases have been created or not
+	//boolean about whether the databases have been created or not
 	private static boolean DatabaseCreated = false;
 	// database type: btree or hash or indexfile
 	private static String DatabaseTypeFromUser = null;
@@ -84,9 +84,7 @@ public class BerkleyDBClient {
 		if(!DatabaseCreated) {
 			return;
 		}
-		
 		try {
-			
 			hash_table.close();
 			btree_table.close();
 		
@@ -118,9 +116,8 @@ public class BerkleyDBClient {
 		try {
 			String filename = "answers.txt";
 
-			FileWriter fw = new FileWriter(filename, true); // the true will
-															// append the new
-															// data
+			//true will append the new data to the end of the file
+			FileWriter fw = new FileWriter(filename, true);
 			fw.write(key + "\n");
 			fw.write(value + "\n");
 			fw.write("\n");
