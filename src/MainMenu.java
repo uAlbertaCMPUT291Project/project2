@@ -67,7 +67,7 @@ public class MainMenu {
 
 		}
 
-		BerkleyDBClient.closeDB();
+		BerkleyDBClient.destoryDatabase();
 		System.out.println("Closing database and exiting. Bye!");
 	}
 

@@ -4,15 +4,16 @@ import com.sleepycat.db.*;
 
 public class BerkleyDBClient {
 
+	//boolean about wheter the databases have been created or not
+	private static boolean DatabaseCreated = false;
 	// database type: btree or hash or indexfile
 	private static String DatabaseTypeFromUser = null;
-	// databse location
+	// Hash table Database location
 	private static final String HASH_TABLE = "/tmp/nstoik1_db/hash_table";
-	// secondary databse location
+	// BTREE table database location
 	private static final String BTREE_TABLE = "/tmp/nstoik1_db/btree_table";
 	// number of records in the database
 	private static final int NO_RECORDS = 100;
-
 	// Database object
 	private static Database hash_table;
 	// Secondary Database object
@@ -25,8 +26,7 @@ public class BerkleyDBClient {
 	 */
 	static void createAndPopulate() {
 
-		try {
-
+		try {			
 			// Create the hash database object.
 			DatabaseConfig hash_dbConfig = new DatabaseConfig();
 			hash_dbConfig.setType(DatabaseType.HASH);
@@ -41,8 +41,9 @@ public class BerkleyDBClient {
 
 			/* populate the new database with NO_RECORDS records */
 			populateTable(NO_RECORDS);
-			System.out.println(NO_RECORDS + " records inserted into"
-					+ HASH_TABLE + " and " + BTREE_TABLE);
+			System.out.println(NO_RECORDS + " records inserted into the table");
+			
+			DatabaseCreated = true;
 
 		} catch (Exception e1) {
 			System.err.println("createAndPopulate failed: " + e1.toString());
@@ -73,19 +74,20 @@ public class BerkleyDBClient {
 	 */
 	static void destoryDatabase() {
 
+		if(!DatabaseCreated) {
+			return;
+		}
+		
 		try {
-			/* Close the database and the db environment */
-			closeDB();
-
-			/* to remove the table */
-			// if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
-			// index_table.remove(DB_TABLE_INDEX, null, null);
-			// }
+			
+			hash_table.close();
+			btree_table.close();
+		
 			hash_table.remove(HASH_TABLE, null, null);
 			btree_table.remove(BTREE_TABLE, null, null);
 
-			System.out.println(HASH_TABLE + " and " + BTREE_TABLE 
-					+ " closed and destroyed succesfully.");
+			System.out.println("Database closed and destroyed succesfully.");
+			DatabaseCreated = false;
 			return;
 
 		} catch (Exception e1) {
@@ -101,25 +103,6 @@ public class BerkleyDBClient {
 
 		DatabaseTypeFromUser = newDatabaseType;
 		System.out.println("Databse type is: " + DatabaseTypeFromUser);
-	}
-
-	/*
-	 * closes the database connection. Called when the system is exiting or
-	 * destroying the database If the database is not destroyed, the database
-	 * can be reopened later
-	 */
-	public static void closeDB() {
-		try {
-			// if (DatabaseTypeFromUser.compareToIgnoreCase("indexfile") == 0) {
-			// index_table.close();
-			// }
-			hash_table.close();
-			btree_table.close();
-			
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-			System.out.println("Error closing Database!");
-		}
 	}
 
 	// -------------------------HELPER FUNCTIONS----------------------//
@@ -192,16 +175,16 @@ public class BerkleyDBClient {
 				/* to insert the key/data pair into the database */
 				status = hash_table.putNoOverwrite(null, kdbt, ddbt);
 
-				if (!status.toString().equalsIgnoreCase(
-						"OperationStatus.SUCCESS")) {
-					System.out.println("Status is: " + status.toString());
+				if (status.toString().equalsIgnoreCase(
+						"OperationStatus.KEYEXIST")) {
+					System.out.println("Hash table key already exists");
 				}
 				
 				status = btree_table.putNoOverwrite(null, kdbt, ddbt);
 
-				if (!status.toString().equalsIgnoreCase(
-						"OperationStatus.SUCCESS")) {
-					System.out.println("Status is: " + status.toString());
+				if (status.toString().equalsIgnoreCase(
+						"OperationStatus.KEYEXIST")) {
+					System.out.println("Btree table key already exists");
 				}
 			}
 		} catch (DatabaseException dbe) {
