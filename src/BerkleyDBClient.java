@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.Random;
+import java.util.Scanner;
+
 import com.sleepycat.db.*;
 
 public class BerkleyDBClient {
@@ -59,14 +61,53 @@ public class BerkleyDBClient {
 
 	/*
 	 * Author: Leah
+	 * Jim worked on this a little bit, cause he felt he should try walking before running
 	 */
 	static void retriveRecordsByKey() {
-	}
+     
+		 DatabaseEntry key = new DatabaseEntry();
+	     DatabaseEntry data = new DatabaseEntry();
+	     Database currentDatabase;
+	     if (DatabaseTypeFromUser.equals("btree")){		//when btree is selected
+	    	 currentDatabase = btree_table;
+	     }else{										//when hash or index is selected 
+	    	 currentDatabase = hash_table; 
+	     }
+	     Scanner scanner = new Scanner(System.in);
+	     System.out.println("Please enter a key: ");
+	     String userInputKeyString = scanner.nextLine();
+	
+	     key.setData(userInputKeyString.getBytes( )); 
+	     key.setSize(userInputKeyString.length( ));
+	     
+	     OperationStatus status = OperationStatus.NOTFOUND;
+	     long startTime;
+	     long endTime;
+	     long durationInMicroSecond;
+	     startTime =  System.nanoTime();
 
+	     try {
+			status = currentDatabase.get(null, key, data, LockMode.DEFAULT);
+		} catch (DatabaseException e) {
+			System.err.println("retriveRecordsByKey failed: " + e.toString());
+			System.exit(-1);
+		}
+		endTime = System.nanoTime();
+	     if (status == OperationStatus.SUCCESS){
+	    	 System.out.println("Retrived 1 record.");
+	    	 writeToFile(key,data);
+	     }else{
+	    	 System.out.println("Retrived 0 record. No Record found");
+	     }
+	     durationInMicroSecond = (endTime - startTime)/1000;
+
+    	 System.out.println("Took: "+durationInMicroSecond+"micro second");
+	}
 	/*
 	 * Author: Jim
 	 */
 	static void retriveRecordsByData() {
+		
 	}
 
 	/*
@@ -112,14 +153,15 @@ public class BerkleyDBClient {
 
 	// -------------------------HELPER FUNCTIONS----------------------//
 
-	private static void writeToFile(String key, String value) {
+	private static void writeToFile(DatabaseEntry key, DatabaseEntry data) {
 		try {
 			String filename = "answers.txt";
-
+			String keyString = new String(key.getData());
+			String dataString = new String(data.getData());
 			//true will append the new data to the end of the file
 			FileWriter fw = new FileWriter(filename, true);
-			fw.write(key + "\n");
-			fw.write(value + "\n");
+			fw.write(keyString + "\n");
+			fw.write(dataString + "\n");
 			fw.write("\n");
 			fw.close();
 		} catch (IOException ioe) {
@@ -160,7 +202,7 @@ public class BerkleyDBClient {
 				kdbt.setSize(s.length());
 
 				// to print out the key/data pair
-				// System.out.println("KEY: " + s);
+				System.out.println("KEY: " + s);
 
 				/* to generate a data string */
 				range = 64 + random.nextInt(64);
@@ -169,8 +211,8 @@ public class BerkleyDBClient {
 					s += (new Character((char) (97 + random.nextInt(26))))
 							.toString();
 				// to print out the key/data pair
-				// System.out.println("DATA: " + s);
-				// System.out.println("");
+				System.out.println("DATA: " + s);
+				System.out.println("");
 
 				/* to create a DBT for data */
 				ddbt = new DatabaseEntry(s.getBytes());
