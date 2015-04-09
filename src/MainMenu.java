@@ -1,4 +1,6 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 //Author: Nelson
@@ -18,8 +20,7 @@ public class MainMenu {
 
 		// input validation
 		if (args.length == 0) {
-			System.out
-					.println("No input arguments, please enter a valid input argument.");
+			System.out.println("No input arguments, please enter a valid input argument.");
 			return;
 		}
 
@@ -32,7 +33,17 @@ public class MainMenu {
 		}
 
 		BerkleyDBClient.setDatabaseType(args[0]);
+		
+		//erase the contents of the file
+		try {
+			PrintWriter writer = new PrintWriter("answers.txt");
+			writer.print("");
+			writer.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		};		
 
+		//start the menu
 		while (menu_choice != quit_code) {
 			menu_choice = get_menu_input();
 			if (menu_choice != quit_code) {

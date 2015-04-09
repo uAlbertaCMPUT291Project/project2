@@ -15,7 +15,7 @@ public class BerkleyDBClient {
 	// BTREE table database location
 	private static final String BTREE_TABLE = "/tmp/nstoik1_db/btree_table";
 	// number of records in the database
-	private static final int NO_RECORDS = 100000;
+	private static final int NO_RECORDS = 100;
 	// Database object
 	private static Database hash_table;
 	// Secondary Database object
@@ -158,6 +158,7 @@ public class BerkleyDBClient {
 			String filename = "answers.txt";
 			String keyString = new String(key.getData());
 			String dataString = new String(data.getData());
+			
 			//true will append the new data to the end of the file
 			FileWriter fw = new FileWriter(filename, true);
 			fw.write(keyString + "\n");

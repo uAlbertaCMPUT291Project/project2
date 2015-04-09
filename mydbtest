@@ -6,14 +6,13 @@ echo "--Starting Program--"
 
 mkdir -p $DATABASELOCATION
 
-
 CLASSPATH=$CLASSPATH:.:/usr/share/java/db.jar:.
+CLASSPATH=$CLASSPATH:.:${PWD}/bin:.
 export CLASSPATH
 LD_LIBRARY_PATH=/oracle/lib
 export LD_LIBRARY_PATH
 
 javac -d bin src/*.java
-cd bin/
 java MainMenu $1
 
 echo "--Program Execution Finished"
