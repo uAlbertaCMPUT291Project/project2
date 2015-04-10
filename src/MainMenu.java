@@ -32,7 +32,7 @@ public class MainMenu {
 			return;
 		}
 
-		BerkleyDBClient.setDatabaseType(args[0]);
+		BerkleyDBClient berkleyDBClient= new BerkleyDBClient (args[0]);
 		
 		//erase the contents of the file
 		try {
@@ -49,19 +49,19 @@ public class MainMenu {
 			if (menu_choice != quit_code) {
 				switch (menu_choice) {
 				case 1:
-					BerkleyDBClient.createAndPopulate();
+					berkleyDBClient.populate();
 					break;
 				case 2:
-					BerkleyDBClient.retriveRecordsByKey();
+					berkleyDBClient.retriveRecordsByKey();
 					break;
 				case 3:
-					BerkleyDBClient.retriveRecordsByData();
+					berkleyDBClient.retriveRecordsByData();
 					break;
 				case 4:
-					BerkleyDBClient.retriveRecordsByRange();
+					berkleyDBClient.retriveRecordsByRange();
 					break;
 				case 5:
-					BerkleyDBClient.destoryDatabase();
+					berkleyDBClient.destoryDatabase();
 				}
 
 			}
@@ -78,7 +78,7 @@ public class MainMenu {
 
 		}
 
-		BerkleyDBClient.destoryDatabase();
+		//berkleyDBClient.destoryDatabase();
 		System.out.println("Closing database and exiting. Bye!");
 	}
 
